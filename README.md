@@ -35,7 +35,15 @@ To launch the Blockchain Ledger application, perform the following steps:
 3. Enter `streamlit run pychain.py` at the Terminal prompt.
 4. Verify that you can access the Blockchain Ledger application in your browser.
 
-![Alt text](/images/pychain_app.png)
+![Launching Blockchain Application](/images/pychain_app.png)
+
+Here is a screenshot that contains a blockchain consisting of several blocks:
+
+![Blockchain with Several Records](/images/pychain_records.png)
+
+You can validate the blockchain by clicking on the "Validate Chain" button. Here is a screenshot that shows the results of clicking on the "Validate Chain" button:
+
+![Validate Chain](/images/pychain_validate.png)
 
 ## Contributors
 

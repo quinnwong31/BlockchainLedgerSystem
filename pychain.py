@@ -6,25 +6,34 @@ from typing import Any, List
 import datetime as datetime
 import pandas as pd
 import hashlib
-
+ 
 @dataclass
+# Record class to store the sender, receiver and amount in a Blockchain ledger system.
 class Record:
+    # Sender of the Record
     sender : str
+    # Receiver of the Record
     receiver : str
+    # Amount of the Record
     amount: float
 
+
 @dataclass
+# Block class to store the Record, previous hash and timestamp of the block.
 class Block:
-
-    # @TODO
-    # Rename the `data` attribute to `record`, and set the data type to `Record`
+    # The Record for this Block entry
     record: Record
-
+    # The creator_id
     creator_id: int
+    # The hash of the previous Block's Record
     prev_hash: str = "0"
+    # The timestamp that this entry was added
     timestamp: str = datetime.datetime.utcnow().strftime("%H:%M:%S")
+    # The nonce variable
     nonce: int = 0
 
+    # Return a hash of the Block, which is based on the Record, creator_id, 
+    # timestamp, prev_hash and nonce. 
     def hash_block(self):
         sha = hashlib.sha256()
 
@@ -47,10 +56,12 @@ class Block:
 
 
 @dataclass
+# PyChain class to store a list of Block objects.
 class PyChain:
     chain: List[Block]
     difficulty: int = 4
 
+    # Returns the proof of work. 
     def proof_of_work(self, block):
 
         calculated_hash = block.hash_block()
@@ -66,10 +77,13 @@ class PyChain:
         print("Wining Hash", calculated_hash)
         return block
 
+    # Adds a Block to the Blockchain
     def add_block(self, candidate_block):
         block = self.proof_of_work(candidate_block)
         self.chain += [block]
 
+    # Returns whether the Blockchain is valid.   This iterates through the 
+    # Blockchain and validates each of the hashes. 
     def is_valid(self):
         block_hash = self.chain[0].hash_block()
 
@@ -85,6 +99,9 @@ class PyChain:
 
 
 @st.cache(allow_output_mutation=True)
+#
+# The Streamlit Application for displaying the Blockchain
+#
 def setup():
     print("Initializing Chain")
     return PyChain([Block("Genesis", 0)])
@@ -95,20 +112,9 @@ st.markdown("## Store a Transaction Record in the PyChain")
 
 pychain = setup()
 
-################################################################################
-# Step 3:
-# Add Relevant User Inputs to the Streamlit Interface
-
-# Code additional input areas for the user interface of your Streamlit
-# application. Create these input areas to capture the sender, receiver, and
-# amount for each transaction that you’ll store in the `Block` record.
-# To do so, complete the following steps:
-# 1. Delete the `input_data` variable from the Streamlit interface.
-# 2. Add an input area where you can get a value for `sender` from the user.
-# 3. Add an input area where you can get a value for `receiver` from the user.
-# 4. Add an input area where you can get a value for `amount` from the user.
-# 5. As part of the Add Block button functionality, update `new_block` so that `Block` consists of an attribute named `record`, which is set equal to a `Record` that contains the `sender`, `receiver`, and `amount` values. The updated `Block`should also include the attributes for `creator_id` and `prev_hash`.
-
+# 
+# Input fields for the Blockchain entry.
+# 
 input_sender = st.text_input("Sender")
 input_receiver = st.text_input("Receiver")
 input_amount = st.text_input("Amount")
@@ -119,6 +125,9 @@ try:
 except ValueError:
     amount = 0
 
+#
+# The 'Add Block' button.   This will add a Block to the Blockchain.
+#
 if st.button("Add Block"):
     prev_block = pychain.chain[-1]
     prev_block_hash = prev_block.hash_block()
@@ -136,9 +145,10 @@ if st.button("Add Block"):
     pychain.add_block(new_block)
     st.balloons()
 
-################################################################################
-# Streamlit Code (continues)
 
+#
+# The 'Pychain Ledger' for displaying the Block entries. 
+#
 st.markdown("## The PyChain Ledger")
 
 pychain_df = pd.DataFrame(pychain.chain).astype(str)
@@ -154,33 +164,9 @@ selected_block = st.sidebar.selectbox(
 
 st.sidebar.write(selected_block)
 
+
+#
+# Button for validating the blockchain.
+#
 if st.button("Validate Chain"):
     st.write(pychain.is_valid())
-
-################################################################################
-# Step 4:
-# Test the PyChain Ledger by Storing Records
-
-# Test your complete `PyChain` ledger and user interface by running your
-# Streamlit application and storing some mined blocks in your `PyChain` ledger.
-# Then test the blockchain validation process by using your `PyChain` ledger.
-# To do so, complete the following steps:
-
-# 1. In the terminal, navigate to the project folder where you've coded the
-#  Challenge.
-
-# 2. In the terminal, run the Streamlit application by
-# using `streamlit run pychain.py`.
-
-# 3. Enter values for the sender, receiver, and amount, and then click the "Add
-# Block" button. Do this several times to store several blocks in the ledger.
-
-# 4. Verify the block contents and hashes in the Streamlit drop-down menu.
-# Take a screenshot of the Streamlit application page, which should detail a
-# blockchain that consists of multiple blocks. Include the screenshot in the
-# `README.md` file for your Challenge repository.
-
-# 5. Test the blockchain validation process by using the web interface.
-# Take a screenshot of the Streamlit application page, which should indicate
-# the validity of the blockchain. Include the screenshot in the `README.md`
-# file for your Challenge repository.
